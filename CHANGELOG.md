@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.10-beallio.1] - 2026-09-03
+
+### 🐛 Bug Fixes
+
+- Keep nested path when discovering HLTB search endpoint by @beallio
+
+### 🧪 Testing
+
+- Cover HLTB search endpoint discovery by @beallio
+
 ## [2.0.9] - 2026-05-15
 
 ### 🐛 Bug Fixes
