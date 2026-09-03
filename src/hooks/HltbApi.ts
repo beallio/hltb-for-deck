@@ -91,7 +91,7 @@ function escapeRegex(value: string) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function extractSearchUrlFromScript(scriptText: string): string | null {
+export function extractSearchUrlFromScript(scriptText: string): string | null {
     if (
         !scriptText.includes('searchTerms') ||
         !scriptText.includes('searchOptions')
