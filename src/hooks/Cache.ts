@@ -69,8 +69,26 @@ function normalizeApiBootstrapCache(value: unknown): ApiBootstrapCache | null {
     return normalized;
 }
 
+const cacheListeners = new Map<string, Set<() => void>>();
+
+// Preference hooks read localForage once on mount, so a write from the Quick
+// Access panel would never reach an already-mounted bar. Writers notify the
+// key's subscribers so every reader re-reads.
+export function subscribeCache(key: string, listener: () => void): () => void {
+    const forKey = cacheListeners.get(key) ?? new Set();
+    forKey.add(listener);
+    cacheListeners.set(key, forKey);
+    return () => {
+        forKey.delete(listener);
+    };
+}
+
 export async function updateCache<T>(key: string, value: T) {
     await localforage.setItem(key, value);
+    const forKey = cacheListeners.get(key);
+    if (forKey) {
+        for (const listener of [...forKey]) listener();
+    }
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
