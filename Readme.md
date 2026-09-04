@@ -16,6 +16,9 @@ Currently this is an actively maintained fork of [original HLTB for Deck plugin]
 - Clicking **View Details** will take you to their site for the game
 - Results are cached for two hours (cache can be cleared from QAM page for HLTB for Deck)
 
+**Clear Cache** removes cached game results only. It keeps your HLTB Style,
+"Hide View Details" and per-stat toggles.
+
 ## Screenshots
 
 ![Title image](images/image001.png)
