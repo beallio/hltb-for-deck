@@ -1,4 +1,5 @@
 import localforage from 'localforage';
+import { Appearance, normalizeAppearance } from '../appearance';
 import { HLTBStyle } from './useStyle';
 import { HLTBStats } from './GameInfoData';
 import { StatPreferences } from './useStatPreferences';
@@ -7,6 +8,7 @@ const database = 'hltb-for-deck';
 export const styleKey = 'hltb-style';
 export const hideDetailsKey = 'hltb-hide-details';
 export const statPreferencesKey = 'hltb-stat-preferences';
+export const appearanceKey = 'hltb-appearance';
 export const apiBootstrapCacheKey = 'hltb-api-bootstrap';
 
 export interface ApiBootstrapSearchAuth {
@@ -67,8 +69,26 @@ function normalizeApiBootstrapCache(value: unknown): ApiBootstrapCache | null {
     return normalized;
 }
 
+const cacheListeners = new Map<string, Set<() => void>>();
+
+// Preference hooks read localForage once on mount, so a write from the Quick
+// Access panel would never reach an already-mounted bar. Writers notify the
+// key's subscribers so every reader re-reads.
+export function subscribeCache(key: string, listener: () => void): () => void {
+    const forKey = cacheListeners.get(key) ?? new Set();
+    forKey.add(listener);
+    cacheListeners.set(key, forKey);
+    return () => {
+        forKey.delete(listener);
+    };
+}
+
 export async function updateCache<T>(key: string, value: T) {
     await localforage.setItem(key, value);
+    const forKey = cacheListeners.get(key);
+    if (forKey) {
+        for (const listener of [...forKey]) listener();
+    }
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
@@ -133,8 +153,22 @@ export async function setShowHide(appId: string) {
 }
 
 export async function getStyle(): Promise<HLTBStyle> {
-    const hltbStyle = await localforage.getItem<HLTBStyle>(styleKey);
-    return hltbStyle === null ? 'default' : hltbStyle;
+    const hltbStyle = await localforage.getItem<unknown>(styleKey);
+    if (
+        hltbStyle === 'default' ||
+        hltbStyle === 'clean' ||
+        hltbStyle === 'clean-left' ||
+        hltbStyle === 'clean-default'
+    ) {
+        return hltbStyle;
+    }
+
+    return 'default';
+}
+
+export async function getAppearance(): Promise<Appearance> {
+    const appearance = await localforage.getItem<unknown>(appearanceKey);
+    return normalizeAppearance(appearance);
 }
 
 export async function getPreference(): Promise<boolean> {
@@ -149,8 +183,18 @@ export async function getStatPreferences(): Promise<StatPreferences | null> {
     return preferences;
 }
 
-export const clearCache = () => {
-    const style = getStyle();
-    localforage.clear();
-    updateCache(styleKey, style);
-};
+const PREFERENCE_KEYS = [
+    styleKey,
+    hideDetailsKey,
+    statPreferencesKey,
+    appearanceKey,
+];
+
+export async function clearCache(): Promise<void> {
+    const keys = await localforage.keys();
+    await Promise.all(
+        keys
+            .filter((k) => !PREFERENCE_KEYS.includes(k))
+            .map((k) => localforage.removeItem(k))
+    );
+}
