@@ -7,7 +7,7 @@ import {
     SliderField,
     ToggleField,
 } from '@decky/ui';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     clearCache,
     hideDetailsKey,
@@ -15,7 +15,7 @@ import {
     styleKey,
     updateCache,
 } from '../../hooks/Cache';
-import { usePreference, useStyle } from '../../hooks/useStyle';
+import { HLTBStyle, usePreference, useStyle } from '../../hooks/useStyle';
 import { useStatPreferences } from '../../hooks/useStatPreferences';
 import useLocalization from '../../hooks/useLocalization';
 import { DEFAULT_APPEARANCE, hydrateAppearance } from '../../appearance';
@@ -29,9 +29,20 @@ export const QuickAccessView = () => {
         await clearCache();
         Navigation.CloseSideMenus();
     };
-    const style = useStyle();
-    // probably overkill for something so simple but it's fine :)
-    const hideDetails = usePreference();
+    // This panel re-renders whenever the appearance store notifies, and both
+    // useStyle and usePreference read storage once with no setter. Without
+    // local state the dropdown and toggle snap back to the value they were
+    // mounted with, so the selection looks like it never took.
+    const persistedStyle = useStyle();
+    const [style, setStyle] = useState<HLTBStyle>(persistedStyle);
+    useEffect(() => setStyle(persistedStyle), [persistedStyle]);
+
+    const persistedHideDetails = usePreference();
+    const [hideDetails, setHideDetails] = useState(persistedHideDetails);
+    useEffect(
+        () => setHideDetails(persistedHideDetails),
+        [persistedHideDetails]
+    );
 
     const preferences = useStatPreferences();
 
@@ -83,6 +94,7 @@ export const QuickAccessView = () => {
                             const newStyle =
                                 styleOptions.find((o) => o.data === newVal.data)
                                     ?.value || 'default';
+                            setStyle(newStyle);
                             updateCache(styleKey, newStyle);
                         }}
                     />
@@ -92,9 +104,10 @@ export const QuickAccessView = () => {
                         label={lang('hideViewDetails')}
                         description={lang('hideViewDetailsDesc')}
                         checked={hideDetails}
-                        onChange={(checked) =>
-                            updateCache(hideDetailsKey, checked)
-                        }
+                        onChange={(checked) => {
+                            setHideDetails(checked);
+                            updateCache(hideDetailsKey, checked);
+                        }}
                     />
                 </PanelSectionRow>
                 <PanelSectionRow>
@@ -138,8 +151,8 @@ export const QuickAccessView = () => {
             <PanelSection title={lang('appearance')}>
                 <PanelSectionRow>
                     <ToggleField
-                        label={lang('customiseAppearance')}
-                        description={lang('customiseAppearanceDesc')}
+                        label={lang('customizeAppearance')}
+                        description={lang('customizeAppearanceDesc')}
                         checked={appearance.custom}
                         onChange={(v) => update({ custom: v })}
                     />
