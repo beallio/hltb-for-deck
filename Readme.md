@@ -15,7 +15,7 @@ Currently this is an actively maintained fork of [original HLTB for Deck plugin]
 -   On an app page, shows four main stats offered by How Long to Beat
 -   Clicking **View Details** will take you to their site for the game
 -   Results are cached for two hours (cache can be cleared from QAM page for HLTB for Deck)
--   Bar appearance is customisable from the QAM page, and overridable by CSS Loader themes
+-   Bar appearance is customizable from the QAM page, and overridable by CSS Loader themes
 
 ## Appearance
 
@@ -23,22 +23,22 @@ The **Appearance** section of the QAM page controls how the HLTB bar looks. It i
 independent of **HLTB Style**, which only selects where the bar is positioned, so
 any appearance setting applies to all four layouts.
 
-| Setting               | Default    | Effect                                                                                   |
-| --------------------- | ---------- | ---------------------------------------------------------------------------------------- |
-| Customise appearance  | off        | Master switch. While off, the built-in defaults apply and your values are kept for later |
-| Background opacity    | 85%        | Darkens the bar so the stats stay readable over bright hero art                          |
-| "View Details" colour | Steam blue | Steam blue (`#67c1f5`) or the same colour as the stats                                   |
-| Text shadow           | off        | Adds a shadow behind the text for extra contrast                                         |
-| Text size             | 100%       | Scales the stat numbers and their labels together                                        |
-| Bottom border         | on         | Shows the divider line under the bar                                                     |
-| Reset appearance      | —          | Returns every setting above to its default                                               |
+| Setting              | Default    | Effect                                                                                   |
+| -------------------- | ---------- | ---------------------------------------------------------------------------------------- |
+| Customize appearance | off        | Master switch. While off, the built-in defaults apply and your values are kept for later |
+| Background opacity   | 85%        | Darkens the bar so the stats stay readable over bright hero art                          |
+| "View Details" color | Steam blue | Steam blue (`#67c1f5`) or the same color as the stats                                    |
+| Text shadow          | off        | Adds a shadow behind the text for extra contrast                                         |
+| Text size            | 100%       | Scales the stat numbers and their labels together                                        |
+| Bottom border        | on         | Shows the divider line under the bar                                                     |
+| Reset appearance     | —          | Returns every setting above to its default                                               |
 
 **Clear Cache** removes cached game results only. It keeps your HLTB Style,
 "Hide View Details", per-stat toggles and appearance settings.
 
 ## Theming with CSS Loader
 
-The bar reads its colours and sizes from CSS custom properties, so a CSS Loader
+The bar reads its colors and sizes from CSS custom properties, so a CSS Loader
 theme can restyle it without redeclaring any rule:
 
 ```css

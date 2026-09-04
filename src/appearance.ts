@@ -25,7 +25,7 @@ export function toStyleVars(appearance: Appearance): CSSProperties {
             variables['--hltb-bar-alpha'] = String(appearance.barAlpha / 100);
         // `currentColor`, not `inherit` or a nested var(): CSS-wide keywords are
         // not honoured after var() substitution, so both silently fall back to
-        // the default link colour. Verified on Steam's CEF 126.
+        // the default link color. Verified on Steam's CEF 126.
         if (appearance.linkColor === 'text')
             variables['--hltb-link-color'] = 'currentColor';
         if (appearance.textShadow)
