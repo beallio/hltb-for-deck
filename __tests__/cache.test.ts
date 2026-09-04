@@ -22,9 +22,12 @@ jest.mock('localforage', () => {
 });
 
 import localforage from 'localforage';
+import { DEFAULT_APPEARANCE } from '../src/appearance';
 import {
     apiBootstrapCacheKey,
+    appearanceKey,
     clearCache,
+    getAppearance,
     getStyle,
     hideDetailsKey,
     statPreferencesKey,
@@ -63,12 +66,32 @@ describe('getStyle', () => {
     });
 });
 
+describe('getAppearance', () => {
+    test('returns defaults when no appearance is stored', async () => {
+        await expect(getAppearance()).resolves.toEqual(DEFAULT_APPEARANCE);
+    });
+
+    test('normalizes a partially invalid stored appearance', async () => {
+        store.set(appearanceKey, {
+            barAlpha: 500,
+            linkColor: 'unknown',
+        });
+
+        await expect(getAppearance()).resolves.toEqual({
+            ...DEFAULT_APPEARANCE,
+            barAlpha: 100,
+            linkColor: 'steam',
+        });
+    });
+});
+
 describe('clearCache', () => {
     test('preserves preference keys and removes cached data', async () => {
         const preferences = new Map<string, unknown>([
             [styleKey, 'clean'],
             [hideDetailsKey, true],
             [statPreferencesKey, { main: false }],
+            [appearanceKey, { custom: true }],
         ]);
         for (const [key, value] of preferences) {
             store.set(key, value);
