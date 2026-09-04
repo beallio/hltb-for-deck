@@ -7,15 +7,72 @@ A plugin to show you game lengths according to How Long To Beat. Built with [Dec
 Currently this is an actively maintained fork of [original HLTB for Deck plugin](https://github.com/hulkrelax/hltb-for-deck).
 [hulkrelax](https://github.com/hulkrelax) is the original author of the plugin. Cheers and huge thanks to [safijari](https://github.com/safijari) / [SDH-Stewardship](https://github.com/SDH-Stewardship) for maintaining the plugin for a long time before this fork.
 
-
 > [!IMPORTANT]  
 > Please note that HLTB does not have an official public API. This plugin (and this fork in particular) is heavily depending on the API changes discovered and implemented in [HowLongToBeat-PythonAPI repository](https://github.com/ScrappyCocco/HowLongToBeat-PythonAPI). Every change done to API by HLTB might break this plugin workability. Unfortunately, there may and will be delays in restoring the plugin workability. However, recent changes were implemented to mitigate changes in the HLTB API and try to get the API name dynamically, bypassing the need for manual changes and a new version if possible.
 
 ## Features
 
-- On an app page, shows four main stats offered by How Long to Beat
-- Clicking **View Details** will take you to their site for the game
-- Results are cached for two hours (cache can be cleared from QAM page for HLTB for Deck)
+-   On an app page, shows four main stats offered by How Long to Beat
+-   Clicking **View Details** will take you to their site for the game
+-   Results are cached for two hours (cache can be cleared from QAM page for HLTB for Deck)
+-   Bar appearance is customisable from the QAM page, and overridable by CSS Loader themes
+
+## Appearance
+
+The **Appearance** section of the QAM page controls how the HLTB bar looks. It is
+independent of **HLTB Style**, which only selects where the bar is positioned, so
+any appearance setting applies to all four layouts.
+
+| Setting               | Default    | Effect                                                                                   |
+| --------------------- | ---------- | ---------------------------------------------------------------------------------------- |
+| Customise appearance  | off        | Master switch. While off, the built-in defaults apply and your values are kept for later |
+| Background opacity    | 85%        | Darkens the bar so the stats stay readable over bright hero art                          |
+| "View Details" colour | Steam blue | Steam blue (`#67c1f5`) or the same colour as the stats                                   |
+| Text shadow           | off        | Adds a shadow behind the text for extra contrast                                         |
+| Text size             | 100%       | Scales the stat numbers and their labels together                                        |
+| Bottom border         | on         | Shows the divider line under the bar                                                     |
+| Reset appearance      | —          | Returns every setting above to its default                                               |
+
+**Clear Cache** removes cached game results only. It keeps your HLTB Style,
+"Hide View Details", per-stat toggles and appearance settings.
+
+## Theming with CSS Loader
+
+The bar reads its colours and sizes from CSS custom properties, so a CSS Loader
+theme can restyle it without redeclaring any rule:
+
+```css
+.hltb-info {
+    --hltb-bar-alpha: 0.75 !important;
+    --hltb-link-color: #dcdedf !important;
+}
+```
+
+`!important` is required, because your QAM choices are applied inline on the same
+element. A theme has to be explicit to override a setting you picked yourself.
+
+Supported properties:
+
+| Property                        | Default                                                          |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `--hltb-bar-alpha`              | `0.85`                                                           |
+| `--hltb-bar-rgb`                | `14 20 27`                                                       |
+| `--hltb-bar-bg`                 | unset — set it to override the whole background, e.g. a gradient |
+| `--hltb-text-color`             | `inherit`                                                        |
+| `--hltb-text-shadow`            | `none`                                                           |
+| `--hltb-link-color`             | `#67c1f5`                                                        |
+| `--hltb-link-color-focus`       | `#ffffff`                                                        |
+| `--hltb-text-scale`             | `1`                                                              |
+| `--hltb-stat-size`              | `16px`                                                           |
+| `--hltb-label-size`             | `10px`                                                           |
+| `--hltb-stat-scale-clean`       | `1.25`                                                           |
+| `--hltb-pad-x` / `--hltb-pad-y` | `35px` / `5px`                                                   |
+| `--hltb-border-width`           | `2px` in the default layout, `0` in the "Clean" layouts          |
+| `--hltb-border-color`           | `rgba(61, 68, 80, .54)`                                          |
+| `--hltb-radius`                 | `0`                                                              |
+
+`--hltb-clean-top` and `--hltb-clean-inset` also exist, but they position the
+"Clean" layouts and may change between releases. Do not rely on them.
 
 ## Screenshots
 
@@ -36,27 +93,27 @@ Currently this is an actively maintained fork of [original HLTB for Deck plugin]
 1. Download and install Node.js from [https://nodejs.org/en/download](https://nodejs.org/en/download).
 2. Verify that installation was successful by running following command in terminal:
 
-   ```bash
-   node --version
-   ```
+    ```bash
+    node --version
+    ```
 
 3. Clone this repository and navigate to the project folder.
 4. Install pnpm:
 
-   ```bash
-   npm install -g pnpm
-   ```
+    ```bash
+    npm install -g pnpm
+    ```
 
 5. Install project dependencies:
 
-   ```bash
-   pnpm install
-   ```
+    ```bash
+    pnpm install
+    ```
 
 6. Build the project:
 
-   ```bash
-   pnpm run build
-   ```
+    ```bash
+    pnpm run build
+    ```
 
 A batch script `build.bat` that builds and packs the project into a ZIP archive for manual installation was created and located in the project root folder.
