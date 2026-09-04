@@ -21,9 +21,9 @@ export default (
     border: 0;
     border-bottom: var(--hltb-border-width, 0) solid var(--hltb-border-color, rgba(61,68,80,.54));
     padding-top: 0px;
-    bottom: 100%;
-    left: 0;
-    right: 0;
+    top: calc(0px - var(--hltb-bar-height, 40px) * var(--hltb-text-scale, 1));
+    height: calc(var(--hltb-bar-height, 40px) * var(--hltb-text-scale, 1));
+    width: 100%;
 }
 
 .hltb-info-absolute {
