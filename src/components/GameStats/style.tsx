@@ -7,13 +7,22 @@ export default (
 }
 
 .hltb-info {
-    background: var(--hltb-bar-bg, rgb(var(--hltb-bar-rgb, 14 20 27) / var(--hltb-bar-alpha, 0.85)));
+    background: var(--hltb-bar-bg, rgb(var(--hltb-bar-rgb, 14 20 27) / var(--hltb-bar-alpha, 0.25)));
     position: relative;
     border-bottom: var(--hltb-border-width, 2px) solid var(--hltb-border-color, rgba(61,68,80,.54));
     padding-top: var(--hltb-pad-y, 5px);
     color: var(--hltb-text-color, inherit);
     text-shadow: var(--hltb-text-shadow, none);
     border-radius: var(--hltb-radius, 0);
+}
+
+/* The floating "Clean" panels carry more backdrop than the in-flow bar, as
+   they always sit over artwork. Setting the property rather than hardcoding a
+   background keeps one opacity slider in charge: an inline value from the
+   Quick Access panel overrides both. */
+.hltb-info-clean-default,
+.hltb-info-clean {
+    --hltb-bar-alpha: 0.5;
 }
 
 .hltb-info-clean-default {

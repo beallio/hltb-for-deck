@@ -23,15 +23,15 @@ The **Appearance** section of the QAM page controls how the HLTB bar looks. It i
 independent of **HLTB Style**, which only selects where the bar is positioned, so
 any appearance setting applies to all four layouts.
 
-| Setting              | Default    | Effect                                                                                   |
-| -------------------- | ---------- | ---------------------------------------------------------------------------------------- |
-| Customize appearance | off        | Master switch. While off, the built-in defaults apply and your values are kept for later |
-| Background opacity   | 85%        | Darkens the bar so the stats stay readable over bright hero art                          |
-| "View Details" color | Steam blue | Steam blue (`#67c1f5`) or the same color as the stats                                    |
-| Text shadow          | off        | Adds a shadow behind the text for extra contrast                                         |
-| Text size            | 100%       | Scales the stat numbers and their labels together                                        |
-| Bottom border        | on         | Shows the divider line under the bar                                                     |
-| Reset appearance     | —          | Returns every setting above to its default                                               |
+| Setting              | Default    | Effect                                                                                                                                                                                                             |
+| -------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Customize appearance | off        | Master switch. While off, the built-in defaults apply and your values are kept for later                                                                                                                           |
+| Background opacity   | 25% / 50%  | Darkens the bar so the stats stay readable over bright hero art. Leave it alone to keep each layout's built-in value (25% for **Default**, 50% for the **"Clean"** layouts); move it to force one value everywhere |
+| "View Details" color | Steam blue | Steam blue (`#67c1f5`) or the same color as the stats                                                                                                                                                              |
+| Text shadow          | off        | Adds a shadow behind the text for extra contrast                                                                                                                                                                   |
+| Text size            | 100%       | Scales the stat numbers and their labels together                                                                                                                                                                  |
+| Bottom border        | on         | Shows the divider line under the bar                                                                                                                                                                               |
+| Reset appearance     | —          | Returns every setting above to its default                                                                                                                                                                         |
 
 **Clear Cache** removes cached game results only. It keeps your HLTB Style,
 "Hide View Details", per-stat toggles and appearance settings.
@@ -55,7 +55,7 @@ Supported properties:
 
 | Property                        | Default                                                          |
 | ------------------------------- | ---------------------------------------------------------------- |
-| `--hltb-bar-alpha`              | `0.85`                                                           |
+| `--hltb-bar-alpha`              | `0.25`, raised to `0.5` by the two `"Clean"` layouts             |
 | `--hltb-bar-rgb`                | `14 20 27`                                                       |
 | `--hltb-bar-bg`                 | unset — set it to override the whole background, e.g. a gradient |
 | `--hltb-text-color`             | `inherit`                                                        |

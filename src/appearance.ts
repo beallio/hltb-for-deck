@@ -11,7 +11,7 @@ export interface Appearance {
 
 export const DEFAULT_APPEARANCE: Appearance = {
     custom: false,
-    barAlpha: 85,
+    barAlpha: 25,
     linkColor: 'steam',
     textShadow: false,
     textScale: 100,
