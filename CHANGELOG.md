@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.0.11-beallio.1] - 2026-09-05
+
+### Features
+
+- Add controls for the HLTB bar opacity, link color, text shadow, text size, and bottom border
+- Let CSS Loader themes change the bar through stable CSS custom properties
+- Keep the original opacity of each HLTB layout until the user changes it
+
+### Bug Fixes
+
+- Apply HLTB style and appearance changes to the open game page immediately
+- Keep the selected HLTB style and Hide View Details setting when the Quick Access Menu updates
+
+### Documentation
+
+- Explain the appearance controls and CSS Loader theme overrides
+
+### Testing
+
+- Cover HLTB search endpoint discovery
+
 ## [2.0.10] - 2026-09-05
 
 ### 🐛 Bug Fixes
