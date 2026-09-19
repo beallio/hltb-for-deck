@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.12-beallio.1] - 2026-09-19
+
+### Bug Fixes
+
+- Restore HLTB loading on Steam Client beta
+- Improve HLTB searches for games with localized titles
+- Guard the context menu lookup when no matching menu is available
+
+### Maintenance
+
+- Rebase the fork build onto upstream 2.0.11
+- Update Decky dependencies
+
 ## [2.0.11] - 2026-09-16
 
 ### 🐛 Bug Fixes
