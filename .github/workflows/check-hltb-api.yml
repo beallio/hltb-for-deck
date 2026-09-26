@@ -26,11 +26,14 @@ jobs:
       - name: Check live HLTB API
         id: api
         continue-on-error: true
+        env:
+          HLTB_REPORT_PATH: ${{ runner.temp }}/hltb-api-diagnostics.json
         run: node scripts/check-hltb-api.mjs
       - name: Open, reuse, or close the tracking PR
         env:
           GH_TOKEN: ${{ github.token }}
           CHECK_RESULT: ${{ steps.api.outcome }}
+          HLTB_REPORT_PATH: ${{ runner.temp }}/hltb-api-diagnostics.json
         run: scripts/track-hltb-api-pr.sh
       - name: Mark outage as failed
         if: steps.api.outcome == 'failure'
