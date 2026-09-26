@@ -13,6 +13,7 @@ const headers = {
         'Chrome: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
 };
 const findings = [];
+const invalidJson = Symbol('invalid JSON');
 
 async function request(label, url, options = {}) {
     try {
@@ -34,7 +35,7 @@ async function parseJson(label, response) {
         return await response.json();
     } catch {
         findings.push(`${label}: invalid JSON`);
-        return null;
+        return invalidJson;
     }
 }
 
@@ -112,8 +113,8 @@ async function check() {
     let token = null;
     if (init) {
         const data = await parseJson('Auth init', init);
-        if (data !== null) {
-            if (typeof data.token === 'string' && data.token)
+        if (data !== invalidJson) {
+            if (typeof data?.token === 'string' && data.token)
                 token = data.token;
             else
                 findings.push(
@@ -164,7 +165,7 @@ async function check() {
         );
         if (search) {
             const results = await parseJson('Search', search);
-            if (results !== null) {
+            if (results !== invalidJson) {
                 if (!Array.isArray(results?.data)) {
                     findings.push('Search: data array missing');
                 } else {
@@ -212,7 +213,7 @@ async function check() {
         );
         if (page) {
             const result = await parseJson('Game data', page);
-            if (result !== null) {
+            if (result !== invalidJson) {
                 const games = result?.pageProps?.game?.data?.game;
                 if (!Array.isArray(games) || games.length !== 1) {
                     findings.push('Game data: single-game array missing');

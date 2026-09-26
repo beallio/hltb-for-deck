@@ -21,15 +21,18 @@ globalThis.fetch = async (url, options = {}) => {
         return new Response('searchTerms searchOptions fetch(\"' + route + '/init\") fetch(\"' + route + '\",{method:\"POST\"})');
     }
     if (path === '/api/search/site/init') {
+        if (scenario === 'null-auth') return json(null);
         if (scenario === 'token-changed') return json({ session: 'secret-session' });
         return json({ token: 'secret-token' });
     }
     if (path === '/api/search/site') {
+        if (scenario === 'null-search') return json(null);
         if (scenario === 'moved-endpoint') return new Response('', { status: 404 });
         if (scenario === 'search-shape') return json({ data: [{ game_id: 7231, game_name: 'Portal 2' }] });
         return json({ data: [{ game_id: 7231, game_name: 'Portal 2', comp_all_count: 100 }] });
     }
     if (path === '/_next/data/build-id/game/7231.json') {
+        if (scenario === 'null-game') return json(null);
         const game = { game_id: 7231, profile_steam: 620, comp_main: 28800,
             comp_plus: 43200, comp_100: 72000, comp_all: 36000 };
         if (scenario === 'game-shape') delete game.comp_main;
@@ -112,6 +115,18 @@ test('search and game response field changes name the missing fields', () => {
     assert.deepEqual(game.findings, [
         'Game data: missing or invalid fields: comp_main',
     ]);
+});
+
+test('a valid JSON null at any stage is a failure, not a successful response', () => {
+    for (const [scenario, expected] of [
+        ['null-auth', 'Auth init: token missing or not a nonempty string'],
+        ['null-search', 'Search: data array missing'],
+        ['null-game', 'Game data: single-game array missing'],
+    ]) {
+        const { code, findings } = run(scenario);
+        assert.equal(code, 1, scenario);
+        assert.deepEqual(findings, [expected], scenario);
+    }
 });
 
 test('a blocked homepage is not reported as an API schema change', () => {
