@@ -1,11 +1,5 @@
 # Changelog
 
-## Unreleased
-
-### Bug Fixes
-
-- Restore game stats after HLTB changed search authentication to return only a token.
-
 ## [2.0.11] - 2026-09-16
 
 ### 🐛 Bug Fixes
