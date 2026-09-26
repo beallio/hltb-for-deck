@@ -19,7 +19,7 @@ pnpm run build
 
 ## HLTB API check
 
-The fork runs `Check HLTB API` every six hours (at 17 minutes past the hour, UTC). It requests a search token, searches for Portal 2, and checks its game playtime data. Run it locally with Node.js 22 or newer:
+The fork runs `Check HLTB API` every hour (at 17 minutes past the hour, UTC). It requests a search token, searches for Portal 2, and checks its game playtime data. Run it locally with Node.js 22 or newer:
 
 ```bash
 node scripts/check-hltb-api.mjs
