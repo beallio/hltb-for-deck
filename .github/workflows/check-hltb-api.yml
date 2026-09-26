@@ -1,0 +1,37 @@
+name: Check HLTB API
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: hltb-api-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.ref == 'refs/heads/fork/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.13'
+      - name: Check live HLTB API
+        id: api
+        continue-on-error: true
+        run: node scripts/check-hltb-api.mjs
+      - name: Open, reuse, or close the tracking PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECK_RESULT: ${{ steps.api.outcome }}
+        run: scripts/track-hltb-api-pr.sh
+      - name: Mark outage as failed
+        if: steps.api.outcome == 'failure'
+        run: exit 1

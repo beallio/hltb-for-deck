@@ -17,6 +17,16 @@ pnpm run build
 
 `pnpm run build` puts the frontend files in `dist/`. To make a ZIP that Decky Loader can install, run `./build.sh` on Linux or macOS, or `build.bat` on Windows. Run it from the repository root. The scripts install dependencies, rebuild the plugin, and replace any existing local build and ZIP files.
 
+## HLTB API check
+
+The fork runs `Check HLTB API` every six hours (at 17 minutes past the hour, UTC). It requests a search token, searches for Portal 2, and checks its game playtime data. Run it locally with Node.js 22 or newer:
+
+```bash
+node scripts/check-hltb-api.mjs
+```
+
+You can also start it from the Actions tab on `fork/main`. A failed check opens a tracking pull request with a link to the run. Further failures reuse that PR; a later successful check closes it. Do not merge the tracking PR. GitHub Actions must have permission to create pull requests in this fork's Actions settings. A failure can also mean GitHub's runner cannot reach HLTB, so inspect the run log before changing the plugin.
+
 ## Theming with CSS Loader
 
 The bar uses CSS custom properties for its colors and sizes. A CSS Loader theme can change them without replacing the bar's CSS rules:
