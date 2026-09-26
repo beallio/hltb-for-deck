@@ -22,8 +22,6 @@ const DEFAULT_SEARCH_URL = '/api/search/site';
 
 interface SearchAuth {
     token: string;
-    hpKey: string;
-    hpVal: string;
 }
 
 interface SearchResultsState {
@@ -49,8 +47,6 @@ function getSearchHeaders(auth: SearchAuth) {
         ...getBaseHeaders(),
         Authority: 'howlongtobeat.com',
         'x-auth-token': auth.token,
-        'x-hp-key': auth.hpKey,
-        'x-hp-val': auth.hpVal,
     };
 }
 
@@ -61,31 +57,9 @@ function parseSearchAuth(data: unknown): SearchAuth | null {
     }
 
     const authData = data as Record<string, unknown>;
-    const token =
-        typeof authData.token === 'string' ? authData.token : undefined;
-    let hpKey: string | undefined;
-    let hpVal: string | undefined;
-
-    for (const [fieldName, fieldValue] of Object.entries(authData)) {
-        if (typeof fieldValue !== 'string') {
-            continue;
-        }
-
-        const lowerFieldName = fieldName.toLowerCase();
-        if (!hpKey && lowerFieldName.includes('key')) {
-            hpKey = fieldValue;
-        } else if (!hpVal && lowerFieldName.includes('val')) {
-            hpVal = fieldValue;
-        }
-    }
-
-    if (token && hpKey && hpVal) {
+    if (typeof authData.token === 'string' && authData.token) {
         console.log('HLTB auth acquired');
-        return {
-            token,
-            hpKey,
-            hpVal,
-        };
+        return { token: authData.token };
     }
 
     console.error('HLTB - incomplete auth response:', data);
@@ -345,8 +319,6 @@ async function ensureBootstrapCacheLoaded() {
     ) {
         searchAuth = {
             token: bootstrapCache.searchAuth.token,
-            hpKey: bootstrapCache.searchAuth.hpKey,
-            hpVal: bootstrapCache.searchAuth.hpVal,
         };
     } else {
         searchAuth = null;
@@ -486,7 +458,6 @@ async function fetchSearchResultsWithAuth(gameName: string, auth: SearchAuth) {
             sort: 0,
             randomizer: 0,
         },
-        [auth.hpKey]: auth.hpVal,
     };
 
     return fetchNoCors(`https://howlongtobeat.com${searchUrl}`, {

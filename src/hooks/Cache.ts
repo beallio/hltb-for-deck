@@ -12,8 +12,6 @@ export const apiBootstrapCacheKey = 'hltb-api-bootstrap';
 export interface ApiBootstrapSearchAuth {
     searchUrl: string;
     token: string;
-    hpKey: string;
-    hpVal: string;
 }
 
 export interface ApiBootstrapCache {
@@ -38,10 +36,7 @@ function isApiBootstrapSearchAuth(
     }
 
     return (
-        typeof value.searchUrl === 'string' &&
-        typeof value.token === 'string' &&
-        typeof value.hpKey === 'string' &&
-        typeof value.hpVal === 'string'
+        typeof value.searchUrl === 'string' && typeof value.token === 'string'
     );
 }
 
@@ -61,7 +56,10 @@ function normalizeApiBootstrapCache(value: unknown): ApiBootstrapCache | null {
     }
 
     if (isApiBootstrapSearchAuth(value.searchAuth)) {
-        normalized.searchAuth = value.searchAuth;
+        normalized.searchAuth = {
+            searchUrl: value.searchAuth.searchUrl,
+            token: value.searchAuth.token,
+        };
     }
 
     return normalized;
