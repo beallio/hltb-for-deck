@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.12-beallio.2] - 2026-09-25
+
+### Bug Fixes
+
+- Restore game stats after HLTB changed search authentication to return only a token.
+
 ## [2.0.12-beallio.1] - 2026-09-19
 
 ### Bug Fixes
