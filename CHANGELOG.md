@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## [2.0.12-beallio.3] - 2026-09-29
 
 ### Bug Fixes
 
 - Use optional HLTB search authentication fields when available without requiring them.
+
+### Maintenance
+
+- Keep the fork's hourly API check compatible with optional search authentication fields.
 
 ## [2.0.12-beallio.2] - 2026-09-25
 
