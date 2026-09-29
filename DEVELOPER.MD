@@ -29,6 +29,8 @@ You can also start it from the Actions tab on `fork/main`. A failed check opens 
 
 The monitor checks the homepage, auth token, Portal 2 search, and Portal 2 game data independently where possible. When auth or search fails, it also checks the site's JavaScript for an advertised search route. Its report names observed HTTP errors, missing fields, or a different search path; a 403 or timeout does not prove an API change. The PR gets a diagnostic comment on the first failure and another only when those findings change. Reports contain no auth tokens, response bodies, or build IDs. To save the same JSON report locally, set `HLTB_REPORT_PATH` to a writable file before running the command above.
 
+When auth init supplies both HP fields, the monitor sends them with the search. A token alone is enough, and the search keeps the plugin's DLC filter.
+
 ## Theming with CSS Loader
 
 The bar uses CSS custom properties for its colors and sizes. A CSS Loader theme can change them without replacing the bar's CSS rules:
