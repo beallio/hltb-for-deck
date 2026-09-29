@@ -111,12 +111,22 @@ async function check() {
         `${origin}${searchPath}/init?t=${Date.now()}`
     );
     let token = null;
+    let hpKey = null;
+    let hpVal = null;
     if (init) {
         const data = await parseJson('Auth init', init);
         if (data !== invalidJson) {
-            if (typeof data?.token === 'string' && data.token)
+            if (typeof data?.token === 'string' && data.token) {
                 token = data.token;
-            else
+                for (const [fieldName, fieldValue] of Object.entries(data)) {
+                    if (typeof fieldValue !== 'string' || !fieldValue) continue;
+                    const lowerFieldName = fieldName.toLowerCase();
+                    if (!hpKey && lowerFieldName.includes('key'))
+                        hpKey = fieldValue;
+                    else if (!hpVal && lowerFieldName.includes('val'))
+                        hpVal = fieldValue;
+                }
+            } else
                 findings.push(
                     'Auth init: token missing or not a nonempty string'
                 );
@@ -125,42 +135,49 @@ async function check() {
 
     let searchOk = false;
     if (token) {
+        const searchHeaders = {
+            ...headers,
+            Authority: 'howlongtobeat.com',
+            'x-auth-token': token,
+        };
+        const payload = {
+            searchType: 'games',
+            searchTerms: ['Portal', '2'],
+            searchPage: 1,
+            size: 20,
+            searchOptions: {
+                games: {
+                    userId: 0,
+                    platform: '',
+                    sortCategory: 'name',
+                    rangeCategory: 'main',
+                    rangeTime: { min: 0, max: 0 },
+                    gameplay: {
+                        perspective: '',
+                        flow: '',
+                        genre: '',
+                        difficulty: '',
+                    },
+                    modifier: 'hide_dlc',
+                },
+                users: {},
+                filter: '',
+                sort: 0,
+                randomizer: 0,
+            },
+        };
+        if (hpKey && hpVal) {
+            searchHeaders['x-hp-key'] = hpKey;
+            searchHeaders['x-hp-val'] = hpVal;
+            payload[hpKey] = hpVal;
+        }
         const search = await request(
             `Search ${searchPath}`,
             `${origin}${searchPath}`,
             {
                 method: 'POST',
-                headers: {
-                    ...headers,
-                    Authority: 'howlongtobeat.com',
-                    'x-auth-token': token,
-                },
-                body: JSON.stringify({
-                    searchType: 'games',
-                    searchTerms: ['Portal', '2'],
-                    searchPage: 1,
-                    size: 20,
-                    searchOptions: {
-                        games: {
-                            userId: 0,
-                            platform: '',
-                            sortCategory: 'name',
-                            rangeCategory: 'main',
-                            rangeTime: { min: 0, max: 0 },
-                            gameplay: {
-                                perspective: '',
-                                flow: '',
-                                genre: '',
-                                difficulty: '',
-                            },
-                            modifier: 'hide_dlc',
-                        },
-                        users: {},
-                        filter: '',
-                        sort: 0,
-                        randomizer: 0,
-                    },
-                }),
+                headers: searchHeaders,
+                body: JSON.stringify(payload),
             }
         );
         if (search) {

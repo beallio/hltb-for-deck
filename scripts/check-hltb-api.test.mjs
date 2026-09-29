@@ -23,9 +23,22 @@ globalThis.fetch = async (url, options = {}) => {
     if (path === '/api/search/site/init') {
         if (scenario === 'null-auth') return json(null);
         if (scenario === 'token-changed') return json({ session: 'secret-session' });
+        if (scenario === 'hp-auth') return json({ token: 'secret-token', challengeKey: 'requestField', challengeVal: 'secret-value' });
+        if (scenario === 'partial-hp-auth') return json({ token: 'secret-token', challengeKey: 'requestField' });
         return json({ token: 'secret-token' });
     }
     if (path === '/api/search/site') {
+        const body = JSON.parse(options.body);
+        if (body.searchOptions?.games?.modifier !== 'hide_dlc') return new Response('', { status: 400 });
+        if (scenario === 'hp-auth' &&
+            (options.headers['x-hp-key'] !== 'requestField' ||
+             options.headers['x-hp-val'] !== 'secret-value' ||
+             body.requestField !== 'secret-value'))
+            return new Response('', { status: 401 });
+        if ((scenario === 'healthy' || scenario === 'partial-hp-auth') &&
+            ('x-hp-key' in options.headers || 'x-hp-val' in options.headers ||
+             'requestField' in body || 'undefined' in body || 'null' in body))
+            return new Response('', { status: 401 });
         if (scenario === 'null-search') return json(null);
         if (scenario === 'moved-endpoint') return new Response('', { status: 404 });
         if (scenario === 'search-shape') return json({ data: [{ game_id: 7231, game_name: 'Portal 2' }] });
@@ -68,7 +81,7 @@ function run(scenario) {
             JSON.stringify(report) +
                 processResult.stdout +
                 processResult.stderr,
-            /secret-token|secret-session/
+            /secret-token|secret-session|secret-value/
         );
         return {
             code: processResult.status,
@@ -82,6 +95,18 @@ function run(scenario) {
 
 test('healthy search and game page produce a clean diagnostic report', () => {
     const { code, findings } = run('healthy');
+    assert.equal(code, 0);
+    assert.deepEqual(findings, []);
+});
+
+test('paired HP auth fields are sent with a DLC-filtered search', () => {
+    const { code, findings } = run('hp-auth');
+    assert.equal(code, 0);
+    assert.deepEqual(findings, []);
+});
+
+test('an incomplete HP challenge is ignored for token-only search', () => {
+    const { code, findings } = run('partial-hp-auth');
     assert.equal(code, 0);
     assert.deepEqual(findings, []);
 });
