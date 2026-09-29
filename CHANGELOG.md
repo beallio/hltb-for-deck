@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Bug Fixes
+
+- Use optional HLTB search authentication fields when available without requiring them.
+
 ## [2.0.12-beallio.2] - 2026-09-25
 
 ### Bug Fixes

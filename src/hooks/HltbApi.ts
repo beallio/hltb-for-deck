@@ -22,6 +22,8 @@ const DEFAULT_SEARCH_URL = '/api/search/site';
 
 interface SearchAuth {
     token: string;
+    hpKey?: string;
+    hpVal?: string;
 }
 
 interface SearchResultsState {
@@ -43,11 +45,16 @@ function getBaseHeaders() {
 }
 
 function getSearchHeaders(auth: SearchAuth) {
-    return {
+    const headers: Record<string, string> = {
         ...getBaseHeaders(),
         Authority: 'howlongtobeat.com',
         'x-auth-token': auth.token,
     };
+    if (auth.hpKey && auth.hpVal) {
+        headers['x-hp-key'] = auth.hpKey;
+        headers['x-hp-val'] = auth.hpVal;
+    }
+    return headers;
 }
 
 function parseSearchAuth(data: unknown): SearchAuth | null {
@@ -58,8 +65,26 @@ function parseSearchAuth(data: unknown): SearchAuth | null {
 
     const authData = data as Record<string, unknown>;
     if (typeof authData.token === 'string' && authData.token) {
+        const auth: SearchAuth = { token: authData.token };
+        let hpKey: string | undefined;
+        let hpVal: string | undefined;
+        for (const [fieldName, fieldValue] of Object.entries(authData)) {
+            if (typeof fieldValue !== 'string' || !fieldValue) {
+                continue;
+            }
+            const lowerFieldName = fieldName.toLowerCase();
+            if (!hpKey && lowerFieldName.includes('key')) {
+                hpKey = fieldValue;
+            } else if (!hpVal && lowerFieldName.includes('val')) {
+                hpVal = fieldValue;
+            }
+        }
+        if (hpKey && hpVal) {
+            auth.hpKey = hpKey;
+            auth.hpVal = hpVal;
+        }
         console.log('HLTB auth acquired');
-        return { token: authData.token };
+        return auth;
     }
 
     console.error('HLTB - incomplete auth response:', data);
@@ -319,6 +344,8 @@ async function ensureBootstrapCacheLoaded() {
     ) {
         searchAuth = {
             token: bootstrapCache.searchAuth.token,
+            hpKey: bootstrapCache.searchAuth.hpKey,
+            hpVal: bootstrapCache.searchAuth.hpVal,
         };
     } else {
         searchAuth = null;
@@ -433,7 +460,7 @@ async function fetchWithSearchAuth(
 }
 
 async function fetchSearchResultsWithAuth(gameName: string, auth: SearchAuth) {
-    const data = {
+    const data: Record<string, unknown> = {
         searchType: 'games',
         searchTerms: gameName.split(' '),
         searchPage: 1,
@@ -459,6 +486,9 @@ async function fetchSearchResultsWithAuth(gameName: string, auth: SearchAuth) {
             randomizer: 0,
         },
     };
+    if (auth.hpKey && auth.hpVal) {
+        data[auth.hpKey] = auth.hpVal;
+    }
 
     return fetchNoCors(`https://howlongtobeat.com${searchUrl}`, {
         method: 'POST',

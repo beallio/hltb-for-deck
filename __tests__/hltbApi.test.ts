@@ -11,10 +11,8 @@ jest.mock('../src/hooks/Cache', () => ({
 }));
 
 import { fetchNoCors } from '@decky/api';
-import {
-    extractSearchUrlFromScript,
-    fetchHltbGameStats,
-} from '../src/hooks/HltbApi';
+import { extractSearchUrlFromScript } from '../src/hooks/HltbApi';
+import type * as HltbApiModule from '../src/hooks/HltbApi';
 
 // Minified excerpts that keep the shape of the real howlongtobeat.com bundle.
 const NESTED_ENDPOINT_SCRIPT = `let ei=async()=>{try{let e=await fetch(\`/api/search/site/init?t=\${Date.now()}\`);if(e.ok){let t=await e.json();return ee({token:t.token}),t}}catch(e){}};let n={searchType:_,searchTerms:x.trim().split(" "),searchPage:Y,size:20,searchOptions:{games:{userId:0,platform:b},users:{},filter:M,sort:0,randomizer:0}};let l=await fetch("/api/search/site",{method:"POST",headers:{"Content-Type":"application/json","x-auth-token":t},body:JSON.stringify(n)});`;
@@ -43,11 +41,34 @@ describe('extractSearchUrlFromScript()', () => {
     });
 });
 
-test('gets game stats when search init supplies only a token', async () => {
-    const request = fetchNoCors as jest.MockedFunction<typeof fetchNoCors>;
+test.each([
+    {
+        name: 'only a token',
+        authResponse: { token: 'current-token' },
+        hp: null,
+    },
+    {
+        name: 'a token and HP fields',
+        authResponse: {
+            token: 'current-token',
+            challengeKey: 'requestField',
+            challengeVal: 'requestValue',
+        },
+        hp: { key: 'requestField', val: 'requestValue' },
+    },
+])('loads stats with $name', async ({ authResponse, hp }) => {
+    jest.resetModules();
+    const deckyApi = jest.requireMock<{
+        fetchNoCors: jest.MockedFunction<typeof fetchNoCors>;
+    }>('@decky/api');
+    const request = deckyApi.fetchNoCors;
+    const { fetchHltbGameStats } = jest.requireActual<typeof HltbApiModule>(
+        '../src/hooks/HltbApi'
+    );
+
     request.mockImplementation(async (url) => {
         if (url.includes('/api/search/site/init?')) {
-            return new Response(JSON.stringify({ token: 'current-token' }));
+            return new Response(JSON.stringify(authResponse));
         }
         if (url.endsWith('/api/search/site')) {
             return new Response(
@@ -100,11 +121,21 @@ test('gets game stats when search init supplies only a token', async () => {
         url.endsWith('/api/search/site')
     );
     expect(searchRequest?.[1]?.headers).toMatchObject({
-        'x-auth-token': 'current-token',
+        'x-auth-token': authResponse.token,
     });
-    expect(searchRequest?.[1]?.headers).not.toHaveProperty('x-hp-key');
-    expect(searchRequest?.[1]?.headers).not.toHaveProperty('x-hp-val');
-    expect(JSON.parse(String(searchRequest?.[1]?.body))).not.toHaveProperty(
-        'undefined'
-    );
+    const payload = JSON.parse(String(searchRequest?.[1]?.body));
+    expect(payload.searchOptions.games.modifier).toBe('hide_dlc');
+    expect(payload).not.toHaveProperty('undefined');
+    expect(payload).not.toHaveProperty('null');
+
+    if (hp) {
+        expect(searchRequest?.[1]?.headers).toMatchObject({
+            'x-hp-key': hp.key,
+            'x-hp-val': hp.val,
+        });
+        expect(payload[hp.key]).toBe(hp.val);
+    } else {
+        expect(searchRequest?.[1]?.headers).not.toHaveProperty('x-hp-key');
+        expect(searchRequest?.[1]?.headers).not.toHaveProperty('x-hp-val');
+    }
 });
