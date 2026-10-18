@@ -1,5 +1,8 @@
 # HLTB for Deck
 
+> [!NOTE]
+> This is a copy of [morwy/hltb-for-deck](https://github.com/morwy/hltb-for-deck). The plugin here is the same as upstream, so install it from the Decky Store or with the link in [Manual installation in Decky](#manual-installation-in-decky). This copy only adds an hourly check that warns when changes to the How Long To Beat website may stop the plugin from working. See [DEVELOPER.MD](DEVELOPER.MD) for details.
+
 ## Description
 
 A plugin to show you game lengths according to How Long To Beat. Built with [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader).
