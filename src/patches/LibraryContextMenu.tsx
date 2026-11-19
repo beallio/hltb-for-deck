@@ -106,29 +106,54 @@ const getFunctionSource = (value: unknown): string => {
     }
 };
 
+const isViteContextMenuWrapper = (value: unknown): boolean => {
+    if (typeof value !== 'function') {
+        return false;
+    }
+    const source = getFunctionSource(value);
+    return (
+        source.length < 220 &&
+        source.includes('navigator:') &&
+        source.includes('instance:') &&
+        source.includes('...')
+    );
+};
+
 const findLibraryContextMenu = () => {
-    const component = findModuleChild((module) => {
-        if (!module || typeof module !== 'object') {
-            return;
-        }
-
-        try {
-            const exports = Object.values(module);
-            if (
-                exports.some((value) =>
-                    getFunctionSource(value).includes('().LibraryContextMenu')
-                )
-            ) {
-                return exports.find((value) =>
-                    getFunctionSource(value).includes('navigator:')
-                );
+    const component =
+        findModuleChild((module) => {
+            if (!module || typeof module !== 'object') {
+                return;
             }
-        } catch {
-            return;
-        }
 
-        return;
-    });
+            try {
+                const exports = Object.values(module);
+                if (
+                    exports.some((value) =>
+                        getFunctionSource(value).includes('().LibraryContextMenu')
+                    )
+                ) {
+                    return exports.find((value) =>
+                        getFunctionSource(value).includes('navigator:')
+                    );
+                }
+            } catch {
+                return;
+            }
+
+            return;
+        }) ??
+        findModuleChild((module) => {
+            if (!module || typeof module !== 'object') {
+                return;
+            }
+
+            try {
+                return Object.values(module).find(isViteContextMenuWrapper);
+            } catch {
+                return;
+            }
+        });
 
     if (typeof component !== 'function') {
         console.warn('HLTB - LibraryContextMenu component not found');
